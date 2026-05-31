@@ -120,16 +120,6 @@
         .choice-btn.correct { background-color: var(--correct-color) !important; color: white !important; border-color: var(--correct-color); }
         .choice-btn.wrong { background-color: var(--wrong-color) !important; color: white !important; border-color: var(--wrong-color); }
 
-        .edu-content {
-            background-color: var(--panel-bg); padding: 20px; border-radius: 12px;
-            box-shadow: 0 4px 6px var(--shadow); width: 100%; line-height: 1.6;
-        }
-        .edu-content h2 { margin-top: 15px; margin-bottom: 8px; color: var(--primary-color); border-bottom: 2px solid var(--secondary-color); padding-bottom: 5px; }
-        .edu-content h2:first-child { margin-top: 0; }
-        .edu-content ul { padding-left: 20px; margin-bottom: 12px; }
-        .edu-content p { margin-bottom: 12px; }
-        .edu-content .highlight { font-weight: bold; color: var(--primary-hover); }
-
         .status-bar {
             width: 100%; display: flex; justify-content: space-between; margin-bottom: 12px;
             font-size: 0.85rem; font-weight: bold; background: var(--panel-bg);
@@ -286,7 +276,6 @@
             <button class="menu-btn" onclick="app.startMode(4)">모든 위치 찾기<span>해당 음의 모든 지판 위치 클릭</span></button>
             <button class="menu-btn" onclick="app.startMode(5)">타임 챌린지<span>60초 동안 지정된 줄의 음 맞추기</span></button>
             <button class="menu-btn" onclick="app.startMode(6)">음정(Interval) 훈련<span>루트음 기준 지정 음정 '모두' 찾기</span></button>
-            <button class="menu-btn" style="background-color: var(--secondary-color);" onclick="app.showView('view-edu')">📚 교육 탭 (이론)<span>베이스 기초 지식 및 음정 이론</span></button>
         </div>
         <div class="controls" style="margin-top: 20px;">
             <button class="btn outline" onclick="app.showView('view-main-gate')">메인으로 가기</button>
@@ -294,7 +283,7 @@
     </main>
 
     <main id="view-acoustic-menu" class="view">
-        <div class="question-box" style="margin-top: 40px;">
+        <div class="question-box" style="margin-top: 40px; width: 100%;">
             <div class="question-text">🪵 어쿠스틱 기타 훈련 준비 중</div>
             <div class="sub-text" style="margin-top: 10px;">여기에 어쿠스틱 기타 관련 코드 및 지판 매칭 훈련을 곧 구현할 예정입니다. 편하게 코드 작업을 이어나가세요!</div>
         </div>
@@ -397,7 +386,7 @@
                 this.isQuestionActive = false;
                 
                 this.questionQueue = [];
-                this.nextTimeout = null; // 자동 넘김 타이머용 변수 추가
+                this.nextTimeout = null;
                 
                 this.noteFormat = 'eng';
                 this.stringOrder = 'player';
@@ -717,7 +706,6 @@
             }
 
             generateQuestion() {
-                // 이전 타이머가 남아있다면 초기화
                 clearTimeout(this.nextTimeout);
 
                 this.clearFretboard();
@@ -804,7 +792,6 @@
                 if (!this.isQuestionActive) return;
                 if (this.targetString !== -1 && clickedString !== this.targetString) return; 
 
-                // 모든 위치 찾기, 음정 훈련 모드일 때
                 if (this.currentMode === 4 || this.currentMode === 6) {
                     if (fretDiv.classList.contains('correct') || fretDiv.classList.contains('root-note')) return;
                     if (pitch === this.targetPitch) {
@@ -814,12 +801,11 @@
                         const remain = this.targetTargets.length - this.foundTargets;
                         document.getElementById('ui-subtext').textContent = `남은 개수: ${remain}개`;
                         
-                        // 다 찾았을 때
                         if (remain === 0) {
                             this.score++; this.isQuestionActive = false;
                             document.getElementById('ui-subtext').textContent = "완벽합니다! (2초 후 자동 이동)";
-                            document.getElementById('btn-next').style.display = 'block'; // 원하면 바로 넘기게 버튼도 띄워줌
-                            this.nextTimeout = setTimeout(() => this.generateQuestion(), 2000); // 2초 뒤 자동 진행
+                            document.getElementById('btn-next').style.display = 'block';
+                            this.nextTimeout = setTimeout(() => this.generateQuestion(), 2000);
                         }
                     } else {
                         this.playSound('wrong'); this.showWrongTemp(fretDiv);
@@ -827,7 +813,6 @@
                     return;
                 }
 
-                // 일반 찾기 모드일 때 (정답)
                 if (pitch === this.targetPitch && clickedString === this.targetString) {
                     this.playSound('correct'); fretDiv.classList.add('correct');
                     fretDiv.querySelector('.fret-note').textContent = notesSharp[pitch];
@@ -838,18 +823,16 @@
                         this.nextTimeout = setTimeout(() => this.generateQuestion(), 400);
                     } else {
                         document.getElementById('ui-subtext').textContent = "정답입니다! (2초 후 자동 이동)";
-                        document.getElementById('btn-next').style.display = 'block'; // 원하면 바로 넘기게 버튼도 띄워줌
-                        this.nextTimeout = setTimeout(() => this.generateQuestion(), 2000); // 2초 뒤 자동 진행
+                        document.getElementById('btn-next').style.display = 'block';
+                        this.nextTimeout = setTimeout(() => this.generateQuestion(), 2000);
                     }
                 } 
-                // 오답일 때
                 else {
                     this.playSound('wrong'); this.showWrongTemp(fretDiv);
                     if (this.currentMode !== 5) {
                         this.isQuestionActive = false;
                         document.getElementById('ui-subtext').textContent = "오답입니다. 힌트 위치를 확인하세요.";
                         this.showHints(this.targetPitch, this.targetString);
-                        // 오답 시에는 힌트를 봐야 하므로 자동 넘김 없이 버튼만 표시
                         document.getElementById('btn-next').style.display = 'block'; 
                     }
                 }
@@ -872,7 +855,7 @@
             }
 
             nextQuestion() { 
-                clearTimeout(this.nextTimeout); // 수동으로 눌렀을 땐 중복 방지를 위해 타이머 해제
+                clearTimeout(this.nextTimeout);
                 this.generateQuestion(); 
             }
         }
