@@ -349,7 +349,7 @@
             
             <div style="margin-top: 20px; border-top: 1px dashed #ccc; padding-top: 15px;">
                 <audio id="comping-audio" preload="auto" src="double-chromatic.mp3"></audio>
-                <button id="play-btn" class="btn" onclick="startCompingPractice()" style="width: 100%; max-width: 300px; padding: 15px; font-size: 1.1rem;">▶️ 재생 (버튼 누르면 바로 시작)</button>
+                <button id="play-btn" class="btn" onclick="startCompingPractice()" style="width: 100%; max-width: 300px; padding: 15px; font-size: 1.1rem;">▶️ 재생 (2.7초 후 시작)</button>
             </div>
         </div>
 
@@ -758,18 +758,18 @@
             audio.playbackRate = compingPlaybackRate;
             audio.currentTime = 0;
             
+            // 1. 오디오 재생 시작
             audio.play().catch(e => {
                 console.log("Audio play error", e);
                 alert("음원 파일을 불러오지 못했거나 브라우저에서 자동재생을 차단했습니다. 파일명과 위치가 같은 폴더에 있는지 확인하세요.");
             });
             
             const beatDuration = (60 / baseBpm) / compingPlaybackRate; 
-            // 실제 베이스 연주음 시작 전 공백(버퍼링 딜레이) 2.7초(2700ms) 싱크 반영
-            const audioBufferDelayMs = 2700 / compingPlaybackRate; 
+            // 2. 고정 2.7초(배속 계산 포함) 대기 후에 애니메이션 루프 타이머들 가동 시작
+            const totalInitialDelayMs = 2700 / compingPlaybackRate;
 
             doubleChromaticPattern.forEach(note => {
-                // 음원 자체 공백 시간(audioBufferDelayMs)을 각 노트 타임아웃에 더해 싱크 일치시킴
-                const delayMs = (note.b * beatDuration * 1000) + audioBufferDelayMs;
+                const delayMs = totalInitialDelayMs + (note.b * beatDuration * 1000);
                 const animDuration = (note.mute ? 0.2 : 0.4) * beatDuration * 1000;
 
                 const timeoutId = setTimeout(() => {
