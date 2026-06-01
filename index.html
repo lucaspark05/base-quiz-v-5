@@ -734,6 +734,7 @@
         let compingPlaybackRate = 1.0;
         let isCompingPlaying = false;
         let compingTimeouts = [];
+        let compingAnimationFrameId = null; // 💡 실시간 싱크 체크를 위한 변수
 
         function setCompingSpeed(rate) {
             compingPlaybackRate = rate;
@@ -757,69 +758,96 @@
 
         // 수정 완료: 잘려나갔던 애니메이션 재생 로직 완벽 복구
         function startCompingPractice() {
-            stopCompingPractice(); 
+            stopCompingPractice(); // 이전 상태 완벽 초기화
             
             const audio = document.getElementById('comping-audio');
             if(!audio) return;
 
+            // 💡 모든 노정의 재생 상태(played)를 초기화합니다.
+            doubleChromaticPattern.forEach(note => note.played = false);
+
             isCompingPlaying = true;
-            audio.playbackRate = compingPlaybackRate;
             audio.currentTime = 0;
             
-            // 💡 audio.play()가 성공적으로 시작된 이후(.then)에 타이머를 돌립니다.
             audio.play().then(() => {
-                if (!isCompingPlaying) return; // 그 사이 정지 버튼을 누른 경우 방지
+                if (!isCompingPlaying) return;
 
-                // 1박자(4분음표)가 차지하는 실제 시간(초)을 계산
-                const beatDuration = (60 / baseBpm) / compingPlaybackRate; 
+                // 💡 중요: 반드시 play()가 시작된 직후에 배속을 설정해야 브라우저 버그가 안 생깁니다.
+                audio.playbackRate = compingPlaybackRate;
 
-                doubleChromaticPattern.forEach(note => {
-                    // 배속에 맞춰 2.7초(2700ms) 딜레이도 유동적으로 계산
-                    const delayMs = (note.b * beatDuration * 1000) + (2700 / compingPlaybackRate);
-                    const animDuration = (note.mute ? 0.2 : 0.4) * beatDuration * 1000;
+                // 1박자(4분음표)가 차지하는 원래 파일 기준 시간(초)
+                const secondsPerBeat = 60 / baseBpm; 
 
-                    const timeoutId = setTimeout(() => {
-                        if (!isCompingPlaying) return;
-                        
-                        const fDiv = document.querySelector(`#comping-fretboard .fret[data-string="${note.s}"][data-fret="${note.f}"]`);
-                        if (fDiv) {
-                            const animClass = note.mute ? 'anim-mute' : 'anim-active';
-                            fDiv.classList.add(animClass);
-                            // 참고: notesSharp와 dataset.pitch가 정의되어 있다고 가정합니다.
-                            fDiv.querySelector('.fret-note').textContent = notesSharp[parseInt(fDiv.dataset.pitch)];
-                            
-                            setTimeout(() => {
-                                fDiv.classList.remove(animClass);
-                                fDiv.querySelector('.fret-note').textContent = '';
-                            }, animDuration);
+                // 실시간 오디오 타임 추적 루프 (60fps로 체크)
+                function checkAudioSync() {
+                    if (!isCompingPlaying) return;
+
+                    // 현재 오디오의 실제 재생 시간 (배속에 상관없이 오디오 원본의 초 기준)
+                    const currentAudioTime = audio.currentTime;
+
+                    doubleChromaticPattern.forEach(note => {
+                        // 💡 각 노트가 켜져야 하는 오디오의 절대 시간 (박자 시간 + 무음 2.7초)
+                        const targetAudioTime = (note.b * secondsPerBeat) + 2.7;
+
+                        // 음원이 목표 시간에 도달했고, 아직 연주되지 않은 노트라면 실행
+                        if (!note.played && currentAudioTime >= targetAudioTime) {
+                            note.played = true; // 중복 실행 방지
+
+                            const fDiv = document.querySelector(`#comping-fretboard .fret[data-string="${note.s}"][data-fret="${note.f}"]`);
+                            if (fDiv) {
+                                const animClass = note.mute ? 'anim-mute' : 'anim-active';
+                                fDiv.classList.add(animClass);
+                                fDiv.querySelector('.fret-note').textContent = notesSharp[parseInt(fDiv.dataset.pitch)];
+                                
+                                // 노트가 화면에 유지되는 시간은 실제 흐르는 속도(배속)에 맞춰 계산
+                                const animDurationMs = (note.mute ? 0.2 : 0.4) * secondsPerBeat * 1000 / compingPlaybackRate;
+
+                                const tId = setTimeout(() => {
+                                    fDiv.classList.remove(animClass);
+                                    fDiv.querySelector('.fret-note').textContent = '';
+                                }, animDurationMs);
+
+                                compingTimeouts.push(tId);
+                            }
                         }
-                    }, delayMs);
-                    
-                    compingTimeouts.push(timeoutId);
-                });
+                    });
+
+                    // 다음 프레임에 다시 체크
+                    compingAnimationFrameId = requestAnimationFrame(checkAudioSync);
+                }
+
+                // 추적 루프 시작
+                compingAnimationFrameId = requestAnimationFrame(checkAudioSync);
+
             }).catch(e => {
                 console.log("Audio play error", e);
-                alert("음원 파일을 불러오지 못했거나 브라우저에서 자동재생을 차단했습니다.");
+                alert("음원 파일을 불러오지 못했거나 자동재생이 차단되었습니다.");
                 isCompingPlaying = false;
             });
         }
 
         function stopCompingPractice() {
             isCompingPlaying = false;
+            
+            // 💡 애니메이션 추적 루프 정지
+            if (compingAnimationFrameId) {
+                cancelAnimationFrame(compingAnimationFrameId);
+                compingAnimationFrameId = null;
+            }
+
             const audio = document.getElementById('comping-audio');
             if(audio) {
                 audio.pause();
                 audio.currentTime = 0;
             }
             
-            // 예약된 모든 애니메이션 취소
             compingTimeouts.forEach(t => clearTimeout(t));
             compingTimeouts = [];
             
-            // 반주용 지판 초기화
             document.querySelectorAll('#comping-fretboard .fret').forEach(f => {
                 f.classList.remove('anim-active', 'anim-mute');
-                f.querySelector('.fret-note').textContent = '';
+                const noteText = f.querySelector('.fret-note');
+                if(noteText) noteText.textContent = '';
             });
         }
         
