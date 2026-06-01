@@ -775,7 +775,7 @@
             const beatDuration = (60 / baseBpm) / compingPlaybackRate; 
 
             doubleChromaticPattern.forEach(note => {
-                const delayMs = (note.b * beatDuration * 1000) + 2700;
+                const delayMs = (note.b * beatDuration * 1000) + (2700 / compingPlaybackRate);
                 // 뮤트음은 짧게 0.2박자, 일반음은 길게 0.4박자 동안 켜짐
                 const animDuration = (note.mute ? 0.2 : 0.4) * beatDuration * 1000;
 
