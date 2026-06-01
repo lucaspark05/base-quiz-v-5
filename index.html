@@ -720,7 +720,7 @@
         document.addEventListener('DOMContentLoaded', () => { app = new BassApp(); });
 
         // ==========================================
-        // 반주법 (더블 크로매틱 어プローチ) 전용 로직
+        // 반주법 (더블 크로매틱 어프로치) 전용 로직
         // ==========================================
         
         const baseBpm = 95;
@@ -764,9 +764,12 @@
             });
             
             const beatDuration = (60 / baseBpm) / compingPlaybackRate; 
+            // 실제 베이스 연주음 시작 전 공백(버퍼링 딜레이) 2.7초(2700ms) 싱크 반영
+            const audioBufferDelayMs = 2700 / compingPlaybackRate; 
 
             doubleChromaticPattern.forEach(note => {
-                const delayMs = note.b * beatDuration * 1000;
+                // 음원 자체 공백 시간(audioBufferDelayMs)을 각 노트 타임아웃에 더해 싱크 일치시킴
+                const delayMs = (note.b * beatDuration * 1000) + audioBufferDelayMs;
                 const animDuration = (note.mute ? 0.2 : 0.4) * beatDuration * 1000;
 
                 const timeoutId = setTimeout(() => {
