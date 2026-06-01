@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#f4ecd8">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>악기자치팀 음악 훈련 웹</title>
+    <title>예배팀 음악 & 지판 훈련 앱</title>
     <style>
         :root {
             --bg-color: #fdfaf6;
@@ -191,9 +191,7 @@
         .fret.hint .fret-note { background-color: #ff9800; color: #fff; }
         .fret.root-note .fret-note { background-color: var(--root-color); color: #fff; box-shadow: 0 0 6px var(--root-color); opacity: 0.9; }
         
-        /* 반주 애니메이션 강조 색상 */
         .fret.anim-active .fret-note { background-color: #ffeb3b; color: #000; box-shadow: 0 0 10px #ffeb3b; transform: scale(1.1); }
-        /* 뮤트 애니메이션 강조 색상 */
         .fret.anim-mute .fret-note { background-color: #9e9e9e; color: #fff; box-shadow: 0 0 8px rgba(158, 158, 158, 0.8); font-weight: 900; }
 
         @keyframes shake {
@@ -242,7 +240,7 @@
 <body>
 
     <header>
-        <h1 id="header-title">🎸 악기자치팀 음악 훈련!</h1>
+        <h1 id="header-title">🎸 예배팀 음악 핵심 훈련</h1>
         <div class="header-controls">
             <button id="theme-toggle" title="테마 변경">🌙</button>
             <button id="settings-btn" title="설정">⚙️</button>
@@ -252,10 +250,10 @@
     <main id="view-main-gate" class="view active">
         <div style="text-align: center; margin-bottom: 20px;">
             <h2 style="color: var(--primary-color); margin-bottom: 5px;">훈련 항목 선택</h2>
-            <p>훈련하고자 하는 영역을 선택하세요.</p>
+            <p>강화하고자 하는 영역을 선택하세요.</p>
         </div>
         <div style="width: 100%; max-width: 500px;">
-            <button class="gate-btn" onclick="app.startNotePractice()">🔤 음이름 훈련<span>영어 음이름 - 계이름 매칭 (중복 출제 차단)</span></button>
+            <button class="gate-btn" onclick="app.startNotePractice()">🔤 음이름 연습<span>영어 음이름 - 계이름 매칭 (중복 출제 차단)</span></button>
             <button class="gate-btn" onclick="app.showView('view-bass-menu')">🎸 베이스 기타<span>줄별 지판 암기, 음정 훈련 및 반주법</span></button>
             <button class="gate-btn" onclick="app.showView('view-acoustic-menu')">🪵 어쿠스틱 기타<span>코드 폼 및 지판 암기 시스템 (준비 중)</span></button>
         </div>
@@ -263,7 +261,7 @@
 
     <main id="view-bass-menu" class="view">
         <div style="text-align: center; margin-bottom: 10px;">
-            <h2 style="color: var(--primary-color);">🎸 베이스 지판 훈련</h2>
+            <h2 style="color: var(--primary-color);">🎸 베이스 지판 트레이닝</h2>
             <p>원하는 난이도와 모드를 선택하세요.</p>
         </div>
         <div class="menu-grid">
@@ -273,10 +271,34 @@
             <button class="menu-btn" onclick="app.startMode(4)">모든 위치 찾기<span>해당 음의 모든 지판 위치 클릭</span></button>
             <button class="menu-btn" onclick="app.startMode(5)">타임 챌린지<span>60초 동안 지정된 줄의 음 맞추기</span></button>
             <button class="menu-btn" onclick="app.startMode(6)">음정(Interval) 훈련<span>루트음 기준 지정 음정 모두 찾기</span></button>
-            <button class="menu-btn" onclick="app.showView('view-bass-comping')" style="border-color: #ff9800;">🎧 반주법 훈련<span>더블 크로매틱 애니메이션 연동</span></button>
+            <button class="menu-btn" onclick="app.showView('view-bass-comping-menu')" style="border-color: #ff9800;">🎧 반주법 지판훈련<span>총 12가지 실전 리듬 패턴 및 예제</span></button>
         </div>
         <div class="controls" style="margin-top: 20px;">
             <button class="btn outline" onclick="app.showView('view-main-gate')">메인으로 가기</button>
+        </div>
+    </main>
+
+    <main id="view-bass-comping-menu" class="view">
+        <div style="text-align: center; margin-bottom: 10px;">
+            <h2 style="color: var(--primary-color);">🎧 반주법 지판훈련 항목</h2>
+            <p>연습하고자 하는 스타일이나 예제를 선택하세요.</p>
+        </div>
+        <div class="menu-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));">
+            <button class="menu-btn" onclick="loadCompingExercise(1)">1. 더블 크로매틱 어프로치<span>크로매틱 마스터링: 뚜두둔</span></button>
+            <button class="menu-btn" onclick="loadCompingExercise(2)">2. 해머링 온 활용<span>해머링 기법 연동 훈련</span></button>
+            <button class="menu-btn" onclick="loadCompingExercise(3)">3. 코드톤 3도 활용<span>근음과 3도 플레이</span></button>
+            <button class="menu-btn" onclick="loadCompingExercise(4)">4. 코드톤 5도 활용<span>안정적인 5도 베이스 라인</span></button>
+            <button class="menu-btn" onclick="loadCompingExercise(5)">5. 코드톤 7, 5도 활용<span>도미넌트/메이저 7도 확장</span></button>
+            <button class="menu-btn" onclick="loadCompingExercise(6)">6. 코드톤 7, 3도, 해머링 온<span>복합 테크닉 응용 패턴</span></button>
+            <button class="menu-btn" onclick="loadCompingExercise(7)">7. 근음, 2, 3도 활용<span>스케일 워킹 베이스 기초</span></button>
+            <button class="menu-btn" onclick="loadCompingExercise(8)">8. 풀링 오프, 더블크로매틱<span>하행 테크닉과 크로매틱 조합</span></button>
+            <button class="menu-btn" onclick="loadCompingExercise(9)" style="border-color: #2196f3;">Example 1<span>실전 종합 예제 1</span></button>
+            <button class="menu-btn" onclick="loadCompingExercise(10)" style="border-color: #2196f3;">Example 2<span>실전 종합 예제 2</span></button>
+            <button class="menu-btn" onclick="loadCompingExercise(11)" style="border-color: #2196f3;">Example 3<span>실전 종합 예제 3</span></button>
+            <button class="menu-btn" onclick="loadCompingExercise(12)" style="border-color: #2196f3;">Example 4<span>실전 종합 예제 4</span></button>
+        </div>
+        <div class="controls" style="margin-top: 20px;">
+            <button class="btn outline" onclick="app.showView('view-bass-menu')">이전 메뉴로</button>
         </div>
     </main>
 
@@ -292,7 +314,7 @@
 
     <main id="view-note-quiz" class="view">
         <div class="status-bar">
-            <span>🔤 음이름 훈련</span>
+            <span>🔤 음이름 연습</span>
             <span id="note-score">점수: 0</span>
             <span id="note-progress">진행률: 1/10</span>
         </div>
@@ -331,16 +353,16 @@
 
     <main id="view-bass-comping" class="view">
         <div class="status-bar">
-            <span>🎧 더블 크로매틱 훈련</span>
+            <span id="comping-status-title">🎧 반주법 훈련</span>
             <span id="current-speed-display">현재 속도: 1.0x</span>
         </div>
         
         <div class="question-box">
-            <div class="question-text">더블 크로매틱 (4분음표)</div>
-            <div class="sub-text">BPM 95 | Dm7 - G7 - CM7</div>
+            <div id="comping-main-title" class="question-text">더블 크로매틱 (4분음표)</div>
+            <div id="comping-sub-title" class="sub-text">BPM 95 | Dm7 - G7 - CM7</div>
             
             <div style="margin-top: 15px; width: 100%; text-align: center;">
-                <img src="tab.png" alt="타브 악보" style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 6px var(--shadow);">
+                <img id="comping-tab-img" src="tab.png" alt="타브 악보" style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 6px var(--shadow);">
                 <div style="font-size: 0.8rem; color: var(--primary-color); margin-top: 5px;">(타브 악보 뷰)</div>
             </div>
             
@@ -350,7 +372,7 @@
             </div>
             
             <div style="margin-top: 20px; border-top: 1px dashed #ccc; padding-top: 15px;">
-                <audio id="comping-audio" preload="auto" src="double-chromatic.mp3"></audio>
+                <audio id="comping-audio" preload="auto" src="더블 크로매틱.mp3"></audio>
                 <button id="play-btn" class="btn" onclick="startCompingPractice()" style="width: 100%; max-width: 300px; padding: 15px; font-size: 1.1rem;">▶️ 재생 (버튼 누르면 바로 시작)</button>
             </div>
         </div>
@@ -361,8 +383,8 @@
         </div>
 
         <div class="controls">
-            <button class="btn outline" onclick="startCompingPractice()">🔄 다시재생</button>
-            <button class="btn outline" onclick="app.showView('view-bass-menu');">메뉴로 나가기</button>
+            <button class="btn outline" onclick="startCompingPractice()">🔄 처음부터 다시재생</button>
+            <button class="btn outline" onclick="app.showView('view-bass-comping-menu'); stopCompingPractice();">항목 목록으로</button>
         </div>
     </main>
 
@@ -544,10 +566,6 @@
             }
 
             showView(viewId) {
-                // 수정 완료: 화면 전환 시 지판, 애니메이션 상태 등을 완전히 초기화
-                this.clearFretboard(); 
-                if (typeof stopCompingPractice === 'function') stopCompingPractice();
-
                 document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
                 document.getElementById(viewId).classList.add('active');
             }
@@ -555,9 +573,8 @@
             closeSettings() { document.getElementById('settings-modal').style.display = 'none'; }
             
             clearFretboard() {
-                // 수정 완료: 앱에 있는 모든 지판의 상태 색상 및 텍스트 리셋
                 document.querySelectorAll('.fret').forEach(f => {
-                    f.classList.remove('correct', 'wrong', 'hint', 'root-note', 'anim-active', 'anim-mute');
+                    f.classList.remove('correct', 'wrong', 'hint', 'root-note');
                     f.querySelector('.fret-note').textContent = ''; 
                 });
                 const fb = document.getElementById('fretboard');
@@ -658,16 +675,14 @@
                     subEl.textContent = "지정된 줄 안에서 정답 위치를 클릭하세요.";
                 } else if (this.currentMode === 4) {
                     this.targetPitch = currentTask.pitch; this.targetTargets = [];
-                    // 수정 완료: 오직 #fretboard에서만 정답 카운팅
-                    document.querySelectorAll('#fretboard .fret').forEach(f => { if (parseInt(f.dataset.pitch) === this.targetPitch) this.targetTargets.push(f); });
+                    document.querySelectorAll('.fret').forEach(f => { if (parseInt(f.dataset.pitch) === this.targetPitch) this.targetTargets.push(f); });
                     this.foundTargets = 0; qEl.textContent = `모든 '${this.getNoteName(this.targetPitch)}' 찾기`;
                     subEl.textContent = `남은 개수: ${this.targetTargets.length}개`;
                 } else if (this.currentMode === 6) {
                     const rootPitch = currentTask.pitch; const intervals = [{name:"2도", semitones:2}, {name:"3도", semitones:4}, {name:"4도", semitones:5}, {name:"5도", semitones:7}];
                     const interval = intervals[Math.floor(Math.random() * intervals.length)];
                     this.targetPitch = (rootPitch + interval.semitones) % 12; this.targetTargets = [];
-                    // 수정 완료: 오직 #fretboard에서만 정답 카운팅 및 루트음 표시
-                    document.querySelectorAll('#fretboard .fret').forEach(f => {
+                    document.querySelectorAll('.fret').forEach(f => {
                         const pitch = parseInt(f.dataset.pitch);
                         if (pitch === this.targetPitch) this.targetTargets.push(f);
                         else if (pitch === rootPitch) { f.classList.add('root-note'); f.querySelector('.fret-note').textContent = notesSharp[rootPitch]; }
@@ -710,8 +725,7 @@
                 } else {
                     this.playSound('wrong'); this.showWrongTemp(fretDiv);
                     this.isQuestionActive = false; document.getElementById('btn-next').style.display = 'block'; 
-                    // 수정 완료: 오답 시 힌트 색상을 오직 #fretboard에만 표시
-                    document.querySelectorAll('#fretboard .fret').forEach(f => {
+                    document.querySelectorAll('.fret').forEach(f => {
                         if (parseInt(f.dataset.pitch) === this.targetPitch && (this.targetString === -1 || parseInt(f.dataset.string) === this.targetString)) {
                             f.classList.add('hint'); f.querySelector('.fret-note').textContent = notesSharp[this.targetPitch];
                         }
@@ -727,14 +741,64 @@
         document.addEventListener('DOMContentLoaded', () => { app = new BassApp(); });
 
         // ==========================================
-        // 반주법 (더블 크로매틱 어프로치) 전용 로직
+        // 🌟 다중 반주법 및 예제 통합 관리 데이터셋
         // ==========================================
         
-        const baseBpm = 95;
-        let compingPlaybackRate = 1.0;
+        let currentExerciseId = 1;
         let isCompingPlaying = false;
-        let compingTimeouts = [];
-        let compingAnimationFrameId = null; // 💡 실시간 싱크 체크를 위한 변수
+        let compingAnimationId = null;
+        let compingPlaybackRate = 1.0;
+
+        // 12가지 연습 항목 설정 구조 (BPM 및 싱크 조절용 offset 세팅 기능 포함)
+        const compingExercises = {
+            1: {
+                title: "더블 크로매틱 어프로치", sub: "BPM 95 | Dm7 - G7 - CM7", bpm: 95, audio: "더블 크로매틱.mp3", img: "tab.png", offset: 2.75,
+                pattern: [
+                    { b: 0, s: 1, f: 5 }, { b: 1.75, s: 1, f: 5 }, { b: 2.50, s: 1, f: 5, mute: true }, { b: 2.75, s: 1, f: 5 }, { b: 3.50, s: 0, f: 1 }, { b: 3.75, s: 0, f: 2 },
+                    { b: 4, s: 0, f: 3 }, { b: 4.5, s: 0, f: 3 }, { b: 5.75, s: 0, f: 3 }, { b: 6.50, s: 0, f: 3, mute: true }, { b: 6.75, s: 0, f: 3 }, { b: 7.50, s: 1, f: 5 }, { b: 7.75, s: 1, f: 4 },
+                    { b: 8, s: 1, f: 3 }, { b: 9.75, s: 1, f: 3 }, { b: 10.50, s: 1, f: 3, mute: true }, { b: 10.75, s: 1, f: 3 }, { b: 11, s: 1, f: 3 },
+                    { b: 12, s: 1, f: 3 }, { b: 13.75, s: 1, f: 3 }, { b: 14.50, s: 1, f: 3, mute: true }, { b: 14.75, s: 1, f: 3 }, { b: 15.50, s: 1, f: 3 }, { b: 15.75, s: 1, f: 4 },
+                    { b: 16, s: 1, f: 5 }, { b: 17.75, s: 1, f: 5 }, { b: 18.50, s: 1, f: 5, mute: true }, { b: 18.75, s: 1, f: 5 }, { b: 19.50, s: 0, f: 1 }, { b: 19.75, s: 0, f: 2 },
+                    { b: 20, s: 0, f: 3 }, { b: 20.5, s: 0, f: 3 }, { b: 21.75, s: 0, f: 3 }, { b: 22.50, s: 0, f: 3, mute: true }, { b: 22.75, s: 0, f: 3 }, { b: 23.50, s: 1, f: 5 }, { b: 23.75, s: 1, f: 4 },
+                    { b: 24, s: 1, f: 3 }, { b: 25.75, s: 1, f: 3 }, { b: 26.50, s: 1, f: 3, mute: true }, { b: 26.75, s: 1, f: 3 }, { b: 27, s: 1, f: 3 },
+                    { b: 28, s: 1, f: 3 }, { b: 29.75, s: 1, f: 3 }, { b: 30.50, s: 1, f: 3, mute: true }, { b: 30.75, s: 1, f: 3 }, { b: 31.50, s: 1, f: 3 }, { b: 31.75, s: 1, f: 4 }, { b: 32, s: 1, f: 5 }
+                ]
+            },
+            2: { title: "해머링 온 활용", sub: "BPM 95 | 해머링 테크닉 연동", bpm: 95, audio: "해머링온.mp3", img: "tab2.png", offset: 0.0, pattern: [] },
+            3: { title: "코드톤 3도 활용", sub: "BPM 95 | 근음 및 3도 진행 플레이", bpm: 95, audio: "코드톤3도.mp3", img: "tab3.png", offset: 0.0, pattern: [] },
+            4: { title: "코드톤 5도 활용", sub: "BPM 95 | 베이직 5도 라인 훈련", bpm: 95, audio: "코드톤5도.mp3", img: "tab4.png", offset: 0.0, pattern: [] },
+            5: { title: "코드톤 7, 5도 활용", sub: "BPM 95 | 7도 음정 확장 컴핑", bpm: 95, audio: "코드톤7_5도.mp3", img: "tab5.png", offset: 0.0, pattern: [] },
+            6: { title: "코드톤 7, 3도, 해머링 온 활용", sub: "BPM 95 | 복합 테크닉 실전", bpm: 95, audio: "코드톤7_3도_해머링.mp3", img: "tab6.png", offset: 0.0, pattern: [] },
+            7: { title: "근음, 2, 3도 활용", sub: "BPM 95 | 스케일 기반 워킹 빌드업", bpm: 95, audio: "근음_2_3도.mp3", img: "tab7.png", offset: 0.0, pattern: [] },
+            8: { title: "풀링 오프, 더블크로매틱 어프로치 활용", sub: "BPM 95 | 고급 하행 테크닉 조합", bpm: 95, audio: "풀링오프_크로매틱.mp3", img: "tab8.png", offset: 0.0, pattern: [] },
+            9: { title: "Example 1", sub: "BPM 95 | 실전 종합 연주 예제 1", bpm: 95, audio: "example1.mp3", img: "ex1.png", offset: 0.0, pattern: [] },
+            10: { title: "Example 2", sub: "BPM 95 | 실전 종합 연주 예제 2", bpm: 95, audio: "example2.mp3", img: "ex2.png", offset: 0.0, pattern: [] },
+            11: { title: "Example 3", sub: "BPM 95 | 실전 종합 연주 예제 3", bpm: 95, audio: "example3.mp3", img: "ex3.png", offset: 0.0, pattern: [] },
+            12: { title: "Example 4", sub: "BPM 95 | 실전 종합 연주 예제 4", bpm: 95, audio: "example4.mp3", img: "ex4.png", offset: 0.0, pattern: [] }
+        };
+
+        // 서브메뉴 클릭 시 실행창 정보를 세팅하고 화면을 전환하는 함수
+        function loadCompingExercise(id) {
+            stopCompingPractice();
+            currentExerciseId = id;
+            const ex = compingExercises[id];
+            
+            // UI 텍스트 및 미디어 경로 변경
+            document.getElementById('comping-status-title').textContent = `🎧 ${ex.title} 훈련`;
+            document.getElementById('comping-main-title').textContent = ex.title;
+            document.getElementById('comping-sub-title').textContent = ex.sub;
+            document.getElementById('comping-tab-img').src = ex.img;
+            
+            const audio = document.getElementById('comping-audio');
+            audio.src = ex.audio;
+            audio.load();
+
+            // 속도는 1.0x 원본 배속으로 초기화
+            setCompingSpeed(1.0);
+            
+            // 재생 화면단으로 뷰 이동
+            app.showView('view-bass-comping');
+        }
 
         function setCompingSpeed(rate) {
             compingPlaybackRate = rate;
@@ -743,119 +807,75 @@
             if(audio) audio.playbackRate = rate;
         }
 
-        const doubleChromaticPattern = [
-            // [1주기: 1~4마디]
-            { b: 0, s: 1, f: 5 }, { b: 1.75, s: 1, f: 5 }, { b: 2.50, s: 1, f: 5, mute: true }, { b: 2.75, s: 1, f: 5 }, { b: 3.50, s: 0, f: 1 }, { b: 3.75, s: 0, f: 2 },
-            { b: 4, s: 0, f: 3 }, { b: 4.5, s: 0, f: 3 }, { b: 5.75, s: 0, f: 3 }, { b: 6.50, s: 0, f: 3, mute: true }, { b: 6.75, s: 0, f: 3 }, { b: 7.50, s: 1, f: 5 }, { b: 7.75, s: 1, f: 4 },
-            { b: 8, s: 1, f: 3 }, { b: 9.75, s: 1, f: 3 }, { b: 10.50, s: 1, f: 3, mute: true }, { b: 10.75, s: 1, f: 3 }, { b: 11, s: 1, f: 3 },
-            { b: 12, s: 1, f: 3 }, { b: 13.75, s: 1, f: 3 }, { b: 14.50, s: 1, f: 3, mute: true }, { b: 14.75, s: 1, f: 3 }, { b: 15.50, s: 1, f: 3 }, { b: 15.75, s: 1, f: 4 },
-            // [2주기: 5~8마디]
-            { b: 16, s: 1, f: 5 }, { b: 17.75, s: 1, f: 5 }, { b: 18.50, s: 1, f: 5, mute: true }, { b: 18.75, s: 1, f: 5 }, { b: 19.50, s: 0, f: 1 }, { b: 19.75, s: 0, f: 2 },
-            { b: 20, s: 0, f: 3 }, { b: 20.5, s: 0, f: 3 }, { b: 21.75, s: 0, f: 3 }, { b: 22.50, s: 0, f: 3, mute: true }, { b: 22.75, s: 0, f: 3 }, { b: 23.50, s: 1, f: 5 }, { b: 23.75, s: 1, f: 4 },
-            { b: 24, s: 1, f: 3 }, { b: 25.75, s: 1, f: 3 }, { b: 26.50, s: 1, f: 3, mute: true }, { b: 26.75, s: 1, f: 3 }, { b: 27, s: 1, f: 3 },
-            { b: 28, s: 1, f: 3 }, { b: 29.75, s: 1, f: 3 }, { b: 30.50, s: 1, f: 3, mute: true }, { b: 30.75, s: 1, f: 3 }, { b: 31.50, s: 1, f: 3 }, { b: 31.75, s: 1, f: 4 }, { b: 32, s: 1, f: 5 }
-        ];
-
-        // 수정 완료: 잘려나갔던 애니메이션 재생 로직 완벽 복구
         function startCompingPractice() {
-            stopCompingPractice(); // 이전 상태 완벽 초기화
-            
+            stopCompingPractice();
             const audio = document.getElementById('comping-audio');
-            if(!audio) return;
-
-            // 💡 모든 노정의 재생 상태(played)를 초기화합니다.
-            doubleChromaticPattern.forEach(note => note.played = false);
-
-            isCompingPlaying = true;
-            audio.currentTime = 0;
             
-            audio.play().then(() => {
-                if (!isCompingPlaying) return;
+            isCompingPlaying = true;
+            audio.playbackRate = compingPlaybackRate;
+            audio.currentTime = 0;
 
-                // 💡 중요: 반드시 play()가 시작된 직후에 배속을 설정해야 브라우저 버그가 안 생깁니다.
-                audio.playbackRate = compingPlaybackRate;
-
-                // 1박자(4분음표)가 차지하는 원래 파일 기준 시간(초)
-                const secondsPerBeat = 60 / baseBpm; 
-
-                // 실시간 오디오 타임 추적 루프 (60fps로 체크)
-                function checkAudioSync() {
-                    if (!isCompingPlaying) return;
-
-                    // 현재 오디오의 실제 재생 시간 (배속에 상관없이 오디오 원본의 초 기준)
-                    const currentAudioTime = audio.currentTime;
-
-                    doubleChromaticPattern.forEach(note => {
-                        // 💡 각 노트가 켜져야 하는 오디오의 절대 시간 (박자 시간 + 무음 2.7초)
-                        const targetAudioTime = (note.b * secondsPerBeat) + 2.7;
-
-                        // 음원이 목표 시간에 도달했고, 아직 연주되지 않은 노트라면 실행
-                        if (!note.played && currentAudioTime >= targetAudioTime) {
-                            note.played = true; // 중복 실행 방지
-
-                            const fDiv = document.querySelector(`#comping-fretboard .fret[data-string="${note.s}"][data-fret="${note.f}"]`);
-                            if (fDiv) {
-                                const animClass = note.mute ? 'anim-mute' : 'anim-active';
-                                fDiv.classList.add(animClass);
-                                fDiv.querySelector('.fret-note').textContent = notesSharp[parseInt(fDiv.dataset.pitch)];
-                                
-                                // 노트가 화면에 유지되는 시간은 실제 흐르는 속도(배속)에 맞춰 계산
-                                const animDurationMs = (note.mute ? 0.2 : 0.4) * secondsPerBeat * 1000 / compingPlaybackRate;
-
-                                const tId = setTimeout(() => {
-                                    fDiv.classList.remove(animClass);
-                                    fDiv.querySelector('.fret-note').textContent = '';
-                                }, animDurationMs);
-
-                                compingTimeouts.push(tId);
-                            }
-                        }
-                    });
-
-                    // 다음 프레임에 다시 체크
-                    compingAnimationFrameId = requestAnimationFrame(checkAudioSync);
-                }
-
-                // 추적 루프 시작
-                compingAnimationFrameId = requestAnimationFrame(checkAudioSync);
-
-            }).catch(e => {
-                console.log("Audio play error", e);
-                alert("음원 파일을 불러오지 못했거나 자동재생이 차단되었습니다.");
-                isCompingPlaying = false;
-            });
+            audio.play().catch(e => console.log("Audio play error:", e));
+            compingAnimationId = requestAnimationFrame(updateCompingFretboard);
         }
 
         function stopCompingPractice() {
             isCompingPlaying = false;
+            cancelAnimationFrame(compingAnimationId);
             
-            // 💡 애니메이션 추적 루프 정지
-            if (compingAnimationFrameId) {
-                cancelAnimationFrame(compingAnimationFrameId);
-                compingAnimationFrameId = null;
-            }
-
             const audio = document.getElementById('comping-audio');
             if(audio) {
-                audio.pause();
+                audio.pause(); 
                 audio.currentTime = 0;
             }
-            
-            compingTimeouts.forEach(t => clearTimeout(t));
-            compingTimeouts = [];
-            
             document.querySelectorAll('#comping-fretboard .fret').forEach(f => {
                 f.classList.remove('anim-active', 'anim-mute');
-                const noteText = f.querySelector('.fret-note');
-                if(noteText) noteText.textContent = '';
+                f.querySelector('.fret-note').textContent = '';
             });
         }
-        
-        // 오디오가 끝나면 자동으로 UI 상태 멈춤
-        document.getElementById('comping-audio').addEventListener('ended', () => {
-            stopCompingPractice();
-        });
 
+        function updateCompingFretboard() {
+            if(!isCompingPlaying) return;
+            
+            const audio = document.getElementById('comping-audio');
+            const currentMusicSec = audio.currentTime; 
+            
+            const ex = compingExercises[currentExerciseId];
+            // 각 훈련데이터마다 각자 설정된 offsetSec 오디오 딜레이 매칭
+            const currentBeat = (currentMusicSec - ex.offset) * (ex.bpm / 60);
+
+            document.querySelectorAll('#comping-fretboard .fret').forEach(f => {
+                f.classList.remove('anim-active', 'anim-mute');
+                f.querySelector('.fret-note').textContent = '';
+            });
+
+            // 현재 선택된 훈련의 데이터 기반으로 애니메이션 렌더링
+            ex.pattern.forEach(note => {
+                const duration = note.mute ? 0.15 : 0.20; 
+
+                if (currentBeat >= note.b && currentBeat < note.b + duration) {
+                    const fretRow = document.querySelector(`#comping-fretboard .string-row[data-string="${note.s}"]`);
+                    if(fretRow) {
+                        const targetFret = fretRow.querySelector(`.fret[data-fret="${note.f}"]`);
+                        if(targetFret) {
+                            if (note.mute) {
+                                targetFret.classList.add('anim-mute');
+                                targetFret.querySelector('.fret-note').textContent = 'X';
+                            } else {
+                                targetFret.classList.add('anim-active');
+                                targetFret.querySelector('.fret-note').textContent = notesSharp[targetFret.dataset.pitch];
+                            }
+                        }
+                    }
+                }
+            });
+
+            if (!audio.paused && !audio.ended) {
+                compingAnimationId = requestAnimationFrame(updateCompingFretboard);
+            } else if (audio.ended) {
+                stopCompingPractice();
+            }
+        }
     </script>
 </body>
 </html>
