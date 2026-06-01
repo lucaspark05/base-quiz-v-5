@@ -726,8 +726,6 @@
         let compingPlaybackRate = 1.0;
         let isCompingPlaying = false;
         let compingAnimationId = null;
-        let compingTimeout = null;
-
 
         function setCompingSpeed(rate) {
             compingPlaybackRate = rate;
@@ -736,57 +734,39 @@
             if(audio) audio.playbackRate = rate;
         }
 
-        function playMetronomeBeep(ctx, time, isFirst) {
-            const osc = ctx.createOscillator();
-            const gainNode = ctx.createGain();
-            osc.connect(gainNode);
-            gainNode.connect(ctx.destination);
-            osc.frequency.setValueAtTime(isFirst ? 1200 : 800, time);
-            gainNode.gain.setValueAtTime(0, time);
-            gainNode.gain.linearRampToValueAtTime(0.5, time + 0.01);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, time + 0.1);
-            osc.start(time);
-            osc.stop(time + 0.1);
-        }
-
+        // 💡 특정 노트에 dur(유지 박자 길이) 속성이 추가되었습니다.
         const doubleChromaticPattern = [
             // [1주기: 1~4마디]
-            // 1마디: Dm7 -> G7(어프로치 F, F#)
+            // 1마디
             { b: 0, s: 1, f: 5 }, { b: 1.75, s: 1, f: 5 }, { b: 2.50, s: 1, f: 5, mute: true }, { b: 2.75, s: 1, f: 5 }, { b: 3.50, s: 0, f: 1 }, { b: 3.75, s: 0, f: 2 },
-            // 2마디: G7 -> CM7(어프로치 Bb, B)
+            // 2마디
             { b: 4, s: 0, f: 3 }, { b: 4.5, s: 0, f: 3 }, { b: 5.75, s: 0, f: 3 }, { b: 6.50, s: 0, f: 3, mute: true }, { b: 6.75, s: 0, f: 3 }, { b: 7.50, s: 1, f: 5 }, { b: 7.75, s: 1, f: 4 },
-            // 3마디: CM7
-            { b: 8, s: 1, f: 3 }, { b: 9.75, s: 1, f: 3 }, { b: 10.50, s: 1, f: 3, mute: true }, { b: 10.75, s: 1, f: 3 }, { b: 11, s: 1, f: 3 },
-            // 4마디: CM7 -> 다시 Dm7로 가기 위한 어프로치 (C, C#)
+            // 3마디
+            { b: 8, s: 1, f: 3 }, { b: 9.75, s: 1, f: 3 }, { b: 10.50, s: 1, f: 3, mute: true }, { b: 10.75, s: 1, f: 3, dur: 1.25 }, { b: 11, s: 1, f: 3 },
+            // 4마디
             { b: 12, s: 1, f: 3 }, { b: 13.75, s: 1, f: 3 }, { b: 14.50, s: 1, f: 3, mute: true }, { b: 14.75, s: 1, f: 3 }, { b: 15.50, s: 1, f: 3 }, { b: 15.75, s: 1, f: 4 },
 
             // [2주기: 5~8마디 (위 패턴에서 박자(b)에 정확히 +16)]
             { b: 16, s: 1, f: 5 }, { b: 17.75, s: 1, f: 5 }, { b: 18.50, s: 1, f: 5, mute: true }, { b: 18.75, s: 1, f: 5 }, { b: 19.50, s: 0, f: 1 }, { b: 19.75, s: 0, f: 2 },
             { b: 20, s: 0, f: 3 }, { b: 20.5, s: 0, f: 3 }, { b: 21.75, s: 0, f: 3 }, { b: 22.50, s: 0, f: 3, mute: true }, { b: 22.75, s: 0, f: 3 }, { b: 23.50, s: 1, f: 5 }, { b: 23.75, s: 1, f: 4 },
-            { b: 24, s: 1, f: 3 }, { b: 25.75, s: 1, f: 3 }, { b: 26.50, s: 1, f: 3, mute: true }, { b: 26.75, s: 1, f: 3 }, { b: 27, s: 1, f: 3 },
-            { b: 28, s: 1, f: 3 }, { b: 29.75, s: 1, f: 3 }, { b: 30.50, s: 1, f: 3, mute: true }, { b: 30.75, s: 1, f: 3 }, { b: 31.50, s: 1, f: 3 }, { b: 31.75, s: 1, f: 4 }, { b: 32, s: 1, f: 5 }
+            { b: 24, s: 1, f: 3 }, { b: 25.75, s: 1, f: 3 }, { b: 26.50, s: 1, f: 3, mute: true }, { b: 26.75, s: 1, f: 3, dur: 1.25 }, { b: 27, s: 1, f: 3 },
+            { b: 28, s: 1, f: 3 }, { b: 29.75, s: 1, f: 3 }, { b: 30.50, s: 1, f: 3, mute: true }, { b: 30.75, s: 1, f: 3 }, { b: 31.50, s: 1, f: 3 }, { b: 31.75, s: 1, f: 4 }
         ];
-
-        // (주의) 기존에 있던 function loadAudioFile(event) { ... } 함수는 이제 필요 없으니 지우셔도 됩니다!
 
         function startCompingPractice() {
             stopCompingPractice();
             const audio = document.getElementById('comping-audio');
-            
-            // 💡 파일이 있는지 체크하는 경고창 제거
+
             isCompingPlaying = true;
             audio.playbackRate = compingPlaybackRate;
             audio.currentTime = 0;
 
-            // 클릭 즉시 재생 & 애니메이션 시작 (메트로놈 없음)
             audio.play().catch(e => console.log("Audio play error:", e));
             compingAnimationId = requestAnimationFrame(updateCompingFretboard);
         }
-        
 
         function stopCompingPractice() {
             isCompingPlaying = false;
-            clearTimeout(compingTimeout);
             cancelAnimationFrame(compingAnimationId);
             
             const audio = document.getElementById('comping-audio');
@@ -805,8 +785,8 @@
             const audio = document.getElementById('comping-audio');
             const currentMusicSec = audio.currentTime; 
             
-            // 1초 딜레이 적용 (오디오보다 애니메이션이 1초 늦게 나옴)
-            const offsetSec = 2.75; 
+            // 1초 딜레이 적용
+            const offsetSec = 1.0; 
             const currentBeat = (currentMusicSec - offsetSec) * (baseBpm / 60);
 
             document.querySelectorAll('#comping-fretboard .fret').forEach(f => {
@@ -815,8 +795,9 @@
             });
 
             doubleChromaticPattern.forEach(note => {
-                // 촘촘한 박자에 맞춰 쿨타임 조절 (뮤트는 0.15, 일반은 0.20)
-                const duration = note.mute ? 0.15 : 0.20; 
+                // 💡 박자 단위로 쿨타임을 관리합니다. 지정된 dur가 있으면 그 길이만큼, 없으면 기본값 사용.
+                let duration = note.mute ? 0.15 : 0.20; 
+                if (note.dur) duration = note.dur; // 직접 지정한 박자 길이 (예: 1.25)
 
                 if (currentBeat >= note.b && currentBeat < note.b + duration) {
                     const fretRow = document.querySelector(`#comping-fretboard .string-row[data-string="${note.s}"]`);
