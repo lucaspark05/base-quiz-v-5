@@ -349,7 +349,7 @@
             
             <div style="margin-top: 20px; border-top: 1px dashed #ccc; padding-top: 15px;">
                 <audio id="comping-audio" preload="auto" src="double-chromatic.mp3"></audio>
-                <button id="play-btn" class="btn" onclick="startCompingPractice()" style="width: 100%; max-width: 300px; padding: 15px; font-size: 1.1rem;">▶️ 재생</button>
+                <button id="play-btn" class="btn" onclick="startCompingPractice()" style="width: 100%; max-width: 300px; padding: 15px; font-size: 1.1rem;">▶️ 재생 (버튼 누르면 바로 시작)</button>
             </div>
         </div>
 
@@ -359,8 +359,8 @@
         </div>
 
         <div class="controls">
-            <button class="btn outline" onclick="startCompingPractice()">🔄 처음부터 다시재생</button>
-            <button class="btn outline" onclick="app.showView('view-bass-menu'); stopCompingPractice();">메뉴로 나가기</button>
+            <button class="btn outline" onclick="startCompingPractice()">🔄 다시재생</button>
+            <button class="btn outline" onclick="app.showView('view-bass-menu');">메뉴로 나가기</button>
         </div>
     </main>
 
@@ -542,6 +542,9 @@
             }
 
             showView(viewId) {
+                this.clearFretboard(); 
+                if (typeof stopCompingPractice === 'function') stopCompingPractice();
+
                 document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
                 document.getElementById(viewId).classList.add('active');
             }
@@ -550,7 +553,7 @@
             
             clearFretboard() {
                 document.querySelectorAll('.fret').forEach(f => {
-                    f.classList.remove('correct', 'wrong', 'hint', 'root-note');
+                    f.classList.remove('correct', 'wrong', 'hint', 'root-note', 'anim-active', 'anim-mute');
                     f.querySelector('.fret-note').textContent = ''; 
                 });
                 const fb = document.getElementById('fretboard');
@@ -651,14 +654,14 @@
                     subEl.textContent = "지정된 줄 안에서 정답 위치를 클릭하세요.";
                 } else if (this.currentMode === 4) {
                     this.targetPitch = currentTask.pitch; this.targetTargets = [];
-                    document.querySelectorAll('.fret').forEach(f => { if (parseInt(f.dataset.pitch) === this.targetPitch) this.targetTargets.push(f); });
+                    document.querySelectorAll('#fretboard .fret').forEach(f => { if (parseInt(f.dataset.pitch) === this.targetPitch) this.targetTargets.push(f); });
                     this.foundTargets = 0; qEl.textContent = `모든 '${this.getNoteName(this.targetPitch)}' 찾기`;
                     subEl.textContent = `남은 개수: ${this.targetTargets.length}개`;
                 } else if (this.currentMode === 6) {
                     const rootPitch = currentTask.pitch; const intervals = [{name:"2도", semitones:2}, {name:"3도", semitones:4}, {name:"4도", semitones:5}, {name:"5도", semitones:7}];
                     const interval = intervals[Math.floor(Math.random() * intervals.length)];
                     this.targetPitch = (rootPitch + interval.semitones) % 12; this.targetTargets = [];
-                    document.querySelectorAll('.fret').forEach(f => {
+                    document.querySelectorAll('#fretboard .fret').forEach(f => {
                         const pitch = parseInt(f.dataset.pitch);
                         if (pitch === this.targetPitch) this.targetTargets.push(f);
                         else if (pitch === rootPitch) { f.classList.add('root-note'); f.querySelector('.fret-note').textContent = notesSharp[rootPitch]; }
@@ -701,7 +704,7 @@
                 } else {
                     this.playSound('wrong'); this.showWrongTemp(fretDiv);
                     this.isQuestionActive = false; document.getElementById('btn-next').style.display = 'block'; 
-                    document.querySelectorAll('.fret').forEach(f => {
+                    document.querySelectorAll('#fretboard .fret').forEach(f => {
                         if (parseInt(f.dataset.pitch) === this.targetPitch && (this.targetString === -1 || parseInt(f.dataset.string) === this.targetString)) {
                             f.classList.add('hint'); f.querySelector('.fret-note').textContent = notesSharp[this.targetPitch];
                         }
@@ -717,7 +720,7 @@
         document.addEventListener('DOMContentLoaded', () => { app = new BassApp(); });
 
         // ==========================================
-        // 반주법 (더블 크로매틱 어프로치) 전용 로직
+        // 반주법 (더블 크로매틱 어プローチ) 전용 로직
         // ==========================================
         
         const baseBpm = 95;
@@ -738,7 +741,6 @@
             { b: 4, s: 0, f: 3 }, { b: 4.5, s: 0, f: 3 }, { b: 5.75, s: 0, f: 3 }, { b: 6.50, s: 0, f: 3, mute: true }, { b: 6.75, s: 0, f: 3 }, { b: 7.50, s: 1, f: 5 }, { b: 7.75, s: 1, f: 4 },
             { b: 8, s: 1, f: 3 }, { b: 9.75, s: 1, f: 3 }, { b: 10.50, s: 1, f: 3, mute: true }, { b: 10.75, s: 1, f: 3 }, { b: 11, s: 1, f: 3 },
             { b: 12, s: 1, f: 3 }, { b: 13.75, s: 1, f: 3 }, { b: 14.50, s: 1, f: 3, mute: true }, { b: 14.75, s: 1, f: 3 }, { b: 15.50, s: 1, f: 3 }, { b: 15.75, s: 1, f: 4 },
-
             // [2주기: 5~8마디]
             { b: 16, s: 1, f: 5 }, { b: 17.75, s: 1, f: 5 }, { b: 18.50, s: 1, f: 5, mute: true }, { b: 18.75, s: 1, f: 5 }, { b: 19.50, s: 0, f: 1 }, { b: 19.75, s: 0, f: 2 },
             { b: 20, s: 0, f: 3 }, { b: 20.5, s: 0, f: 3 }, { b: 21.75, s: 0, f: 3 }, { b: 22.50, s: 0, f: 3, mute: true }, { b: 22.75, s: 0, f: 3 }, { b: 23.50, s: 1, f: 5 }, { b: 23.75, s: 1, f: 4 },
@@ -747,40 +749,42 @@
         ];
 
         function startCompingPractice() {
-            stopCompingPractice();
+            stopCompingPractice(); 
+            
             const audio = document.getElementById('comping-audio');
             if(!audio) return;
-            
+
             isCompingPlaying = true;
             audio.playbackRate = compingPlaybackRate;
             audio.currentTime = 0;
-
+            
             audio.play().catch(e => {
-                console.log("Audio play error:", e);
+                console.log("Audio play error", e);
+                alert("음원 파일을 불러오지 못했거나 브라우저에서 자동재생을 차단했습니다. 파일명과 위치가 같은 폴더에 있는지 확인하세요.");
             });
-
-            const beatDuration = (60 / baseBpm) / compingPlaybackRate;
+            
+            const beatDuration = (60 / baseBpm) / compingPlaybackRate; 
 
             doubleChromaticPattern.forEach(note => {
-                const delayMs = note.b * beatDuration * 1000; // 2.7초 딜레이 완벽 제거 (즉시 동시 실행)
+                const delayMs = note.b * beatDuration * 1000;
                 const animDuration = (note.mute ? 0.2 : 0.4) * beatDuration * 1000;
 
                 const timeoutId = setTimeout(() => {
                     if (!isCompingPlaying) return;
-
+                    
                     const fDiv = document.querySelector(`#comping-fretboard .fret[data-string="${note.s}"][data-fret="${note.f}"]`);
                     if (fDiv) {
                         const animClass = note.mute ? 'anim-mute' : 'anim-active';
                         fDiv.classList.add(animClass);
                         fDiv.querySelector('.fret-note').textContent = notesSharp[parseInt(fDiv.dataset.pitch)];
-
+                        
                         setTimeout(() => {
                             fDiv.classList.remove(animClass);
                             fDiv.querySelector('.fret-note').textContent = '';
                         }, animDuration);
                     }
                 }, delayMs);
-
+                
                 compingTimeouts.push(timeoutId);
             });
         }
@@ -792,19 +796,20 @@
                 audio.pause();
                 audio.currentTime = 0;
             }
-
+            
             compingTimeouts.forEach(t => clearTimeout(t));
             compingTimeouts = [];
-
+            
             document.querySelectorAll('#comping-fretboard .fret').forEach(f => {
                 f.classList.remove('anim-active', 'anim-mute');
                 f.querySelector('.fret-note').textContent = '';
             });
         }
-
+        
         document.getElementById('comping-audio').addEventListener('ended', () => {
             stopCompingPractice();
         });
+
     </script>
 </body>
 </html>
